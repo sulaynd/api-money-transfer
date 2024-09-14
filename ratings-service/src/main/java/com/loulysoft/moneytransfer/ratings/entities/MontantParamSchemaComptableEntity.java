@@ -32,7 +32,7 @@ public class MontantParamSchemaComptableEntity {
 
     @JoinColumn(name = "mpsc_pr_id")
     @ManyToOne(fetch = FetchType.LAZY)
-    private ParametreRechercheEntity parametreRecherche;
+    private ParametreRechercheEntity search;
 
     @JoinColumn(name = "mpsc_msc_id")
     @ManyToOne(fetch = FetchType.LAZY)

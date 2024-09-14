@@ -3,15 +3,19 @@ package com.loulysoft.moneytransfer.ratings.testdata;
 import com.loulysoft.moneytransfer.ratings.models.CodeEcriture;
 import com.loulysoft.moneytransfer.ratings.models.Compte;
 import com.loulysoft.moneytransfer.ratings.models.CompteSchemaComptable;
+import com.loulysoft.moneytransfer.ratings.models.Devise;
 import com.loulysoft.moneytransfer.ratings.models.EcritureSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.MontantParamSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.MontantSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.Parametre;
 import com.loulysoft.moneytransfer.ratings.models.ParametreRecherche;
+import com.loulysoft.moneytransfer.ratings.models.Pays;
 import com.loulysoft.moneytransfer.ratings.models.SchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.TypeParametre;
 import com.loulysoft.moneytransfer.ratings.models.TypeService;
 import com.loulysoft.moneytransfer.ratings.models.TypeUniteOrganisational;
+import com.loulysoft.moneytransfer.ratings.models.UniteOrganisational;
+import com.loulysoft.moneytransfer.ratings.models.Users;
 import com.loulysoft.moneytransfer.ratings.utils.Category;
 import com.loulysoft.moneytransfer.ratings.utils.Code;
 import com.loulysoft.moneytransfer.ratings.utils.DebitCredit;
@@ -25,12 +29,16 @@ import java.util.List;
 
 public class TestDataFactory {
 
-    public static TypeService createTypeService() {
-        return TypeService.builder()
-                .code("CASH_TRANSFER")
-                .composant("")
-                .decouvert_applicable("OUI")
-                .description("Envoi cash")
+    public static Devise createDevise() {
+        return Devise.builder().code("XOF").uniteComptable(1).uniteMonetaire(5).build();
+    }
+
+    public static Pays createPays() {
+        return Pays.builder()
+                .code("SN")
+                .devise(createDevise())
+                .indicatif("221")
+                .libelle("SENEGAL")
                 .build();
     }
 
@@ -42,6 +50,35 @@ public class TestDataFactory {
                 .nodeType(NodeType.LEAF)
                 .niveau(Niveau.TROIS)
                 .description("DISTRIBUTEUR")
+                .build();
+    }
+
+    public static UniteOrganisational createUniteOrganisational() {
+        return UniteOrganisational.builder()
+                .id(1001L)
+                .code("SYSTEM")
+                .status('A')
+                .root(null)
+                .pays(createPays())
+                .description("LoulySoft")
+                .type(createTypeUniteOrganisational())
+                .build();
+    }
+
+    public static Users createUser() {
+        return Users.builder()
+                .id(1020L)
+                .userName("user")
+                .uniteOrganisational(createUniteOrganisational())
+                .build();
+    }
+
+    public static TypeService createTypeService() {
+        return TypeService.builder()
+                .code("CASH_TRANSFER")
+                .composant("")
+                .decouvert_applicable("OUI")
+                .description("Envoi cash")
                 .build();
     }
 
@@ -92,7 +129,7 @@ public class TestDataFactory {
         return MontantParamSchemaComptable.builder()
                 .id(1000L)
                 .montantSchema(createMontantSchema())
-                .parametreRecherche(createParametreRecherche())
+                .search(createParametreRecherche())
                 .build();
     }
 

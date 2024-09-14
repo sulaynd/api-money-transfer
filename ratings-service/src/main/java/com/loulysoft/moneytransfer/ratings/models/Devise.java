@@ -9,11 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MontantParamSchemaComptable {
+public class Devise {
+    private String code;
 
-    private Long id;
+    private float uniteMonetaire;
 
-    private ParametreRecherche search;
-
-    private MontantSchemaComptable montantSchema;
+    private float uniteComptable;
 }

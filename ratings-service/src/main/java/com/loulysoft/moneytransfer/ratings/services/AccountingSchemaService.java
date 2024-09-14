@@ -4,21 +4,17 @@ import com.loulysoft.moneytransfer.ratings.models.EcritureSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.MontantParamSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.MontantSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.SchemaComptable;
-import com.loulysoft.moneytransfer.ratings.utils.Code;
-import com.loulysoft.moneytransfer.ratings.utils.Pivot;
-import com.loulysoft.moneytransfer.ratings.utils.Type;
+import com.loulysoft.moneytransfer.ratings.models.Users;
 import java.util.List;
 
 public interface AccountingSchemaService {
 
-    SchemaComptable readSchemaByServiceCodeAndTypeCodeAndVariantAndStatus(
-            String serviceCode, String type, String variant, String status);
+    SchemaComptable readSchemaByServiceCodeAndTypeCodeAndVariantAndStatus(Users user, String serviceCode);
 
-    MontantSchemaComptable readMontantSchemaBySchemaComptableId(Long schemaComptableId);
+    MontantSchemaComptable readMontantSchemaBySchemaId(Long schemaId);
 
     List<MontantParamSchemaComptable> readMontantParamSchemaByMontantSchemaIdAndParametreRechercheType(
-            Long montantSchemaId, Type type);
+            Long montantSchemaId);
 
-    List<EcritureSchemaComptable> readEcritureSchemaBySchemaIdAndCodeEcritureCodeIn(
-            Long schemaId, List<Pivot> pivots, Type type, Integer niveau, List<Code> codes);
+    List<EcritureSchemaComptable> readEcritureSchemaBySchemaIdAndCodeEcritureCodeIn(Users user, Long schemaId);
 }

@@ -6,6 +6,7 @@ import com.loulysoft.moneytransfer.ratings.models.EcritureSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.MontantParamSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.MontantSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.SchemaComptable;
+import com.loulysoft.moneytransfer.ratings.models.Users;
 import com.loulysoft.moneytransfer.ratings.repositories.EcritureSchemaComptableRepository;
 import com.loulysoft.moneytransfer.ratings.repositories.MontantParamSchemaComptableRepository;
 import com.loulysoft.moneytransfer.ratings.repositories.MontantSchemaComptableRepository;
@@ -14,6 +15,10 @@ import com.loulysoft.moneytransfer.ratings.services.AccountingSchemaService;
 import com.loulysoft.moneytransfer.ratings.utils.Code;
 import com.loulysoft.moneytransfer.ratings.utils.Pivot;
 import com.loulysoft.moneytransfer.ratings.utils.Type;
+import com.loulysoft.moneytransfer.ratings.utils.TypeUnit;
+import com.loulysoft.moneytransfer.ratings.utils.Variant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,32 +53,50 @@ public class AccountingSchemaServiceImpl implements AccountingSchemaService {
     }
 
     @Override
-    public SchemaComptable readSchemaByServiceCodeAndTypeCodeAndVariantAndStatus(
-            String serviceCode, String type, String variant, String status) {
-        return schemaRepository
-                .findByServiceCodeAndTypeCodeAndVariantAndStatus(serviceCode, type, variant, status)
+    public SchemaComptable readSchemaByServiceCodeAndTypeCodeAndVariantAndStatus(Users user, String serviceCode) {
+
+        String type = user.getUniteOrganisational().getType().getCode();
+        Variant variant = Variant.VARIANTE_1;
+        Character status = 'A';
+
+        return accountingMapper.toSchemaComptable(schemaRepository
+                .findByServiceCodeAndTypeCodeAndVariantAndStatusOrderByVersionDesc(serviceCode, type, variant, status)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Account Schema with service " + serviceCode + " not found"));
+                        new ResourceNotFoundException("Account Schema with service " + serviceCode + " not found")));
     }
 
     @Override
-    public MontantSchemaComptable readMontantSchemaBySchemaComptableId(Long schemaComptableId) {
-        return montantSchemaRepository
-                .findBySchemaId(schemaComptableId)
+    public MontantSchemaComptable readMontantSchemaBySchemaId(Long schemaId) {
+        return accountingMapper.toMontantSchemaComptable(montantSchemaRepository
+                .findBySchemaIdOrderByRangAsc(schemaId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Amount accounting Schema with schema Id " + schemaComptableId + " not found"));
+                        "Amount accounting Schema with schema Id " + schemaId + " not found")));
     }
 
     @Override
     public List<MontantParamSchemaComptable> readMontantParamSchemaByMontantSchemaIdAndParametreRechercheType(
-            Long montantSchemaId, Type type) {
+            Long montantSchemaId) {
+        Type type = Type.DEVISE;
         return accountingMapper.convertToMontantParamSchema(
-                montantParamSchemaRepository.findByMontantSchemaIdAndParametreRechercheType(montantSchemaId, type));
+                montantParamSchemaRepository.findByMontantSchemaIdAndSearchType(montantSchemaId, type));
     }
 
     @Override
-    public List<EcritureSchemaComptable> readEcritureSchemaBySchemaIdAndCodeEcritureCodeIn(
-            Long schemaId, List<Pivot> pivots, Type type, Integer niveau, List<Code> codes) {
+    public List<EcritureSchemaComptable> readEcritureSchemaBySchemaIdAndCodeEcritureCodeIn(Users user, Long schemaId) {
+
+        List<Pivot> pivots =
+                Arrays.asList(Pivot.UNITE_ORGANISATIONNELLE_EMETTRICE, Pivot.UNITE_ORGANISATIONNELLE_TIERCE);
+        List<Code> codes = new ArrayList<>();
+        codes.add(Code.PRINCIPAL);
+        codes.add(Code.FRAIS);
+        codes.add(Code.TIMBRE);
+        codes.add(Code.TAXES);
+        Type type = Type.UNITE_ORGANISATIONELLE;
+        int niveau = 0;
+        if (user.getUniteOrganisational().getType().getCode().equals(TypeUnit.AGENCE_BANQUE.name())) {
+            niveau = 1;
+        }
+
         return accountingMapper.convertToEcritureSchemaComptable(
                 ecritureSchemaComptableRepository
                         .findBySchemaIdAndAccountSearchPivotInAndAccountSearchTypeAndAccountSearchNiveauAndWriterCodeIn(

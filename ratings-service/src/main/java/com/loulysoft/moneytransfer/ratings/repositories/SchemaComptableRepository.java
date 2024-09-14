@@ -1,7 +1,7 @@
 package com.loulysoft.moneytransfer.ratings.repositories;
 
 import com.loulysoft.moneytransfer.ratings.entities.SchemaComptableEntity;
-import com.loulysoft.moneytransfer.ratings.models.SchemaComptable;
+import com.loulysoft.moneytransfer.ratings.utils.Variant;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -19,6 +19,6 @@ public interface SchemaComptableRepository extends JpaRepository<SchemaComptable
     //        AND s.status =:status
     //        ORDER BY s.version desc
     //        """)
-    Optional<SchemaComptable> findByServiceCodeAndTypeCodeAndVariantAndStatus(
-            String serviceCode, String type, String variant, String status);
+    Optional<SchemaComptableEntity> findByServiceCodeAndTypeCodeAndVariantAndStatusOrderByVersionDesc(
+            String serviceCode, String type, Variant variant, Character status);
 }

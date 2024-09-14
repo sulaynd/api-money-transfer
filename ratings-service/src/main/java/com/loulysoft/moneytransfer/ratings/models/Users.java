@@ -1,5 +1,6 @@
 package com.loulysoft.moneytransfer.ratings.models;
 
+import com.loulysoft.moneytransfer.ratings.utils.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +10,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MontantParamSchemaComptable {
+public class Users {
 
     private Long id;
 
-    private ParametreRecherche search;
+    private String userName;
 
-    private MontantSchemaComptable montantSchema;
+    private String password;
+
+    private String route;
+
+    private Roles role;
+
+    private UniteOrganisational uniteOrganisational;
 }

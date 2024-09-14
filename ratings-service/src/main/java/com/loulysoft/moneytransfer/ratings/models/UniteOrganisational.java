@@ -9,11 +9,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MontantParamSchemaComptable {
-
+public class UniteOrganisational {
     private Long id;
 
-    private ParametreRecherche search;
+    private String description;
 
-    private MontantSchemaComptable montantSchema;
+    private Character status;
+
+    private String code;
+
+    private TypeUniteOrganisational type;
+
+    private UniteOrganisational parent, root;
+
+    private Pays pays;
 }

@@ -21,10 +21,10 @@ public class DeviseEntity {
     private String code;
 
     @Column(name = "dev_uniteMonetaire")
-    private String uniteMonetaire;
+    private float uniteMonetaire;
 
     @Column(name = "dev_uniteComptable")
-    private String uniteComptable;
+    private float uniteComptable;
 
     //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "devise")
     //    private Set<PaysEntity> pays;

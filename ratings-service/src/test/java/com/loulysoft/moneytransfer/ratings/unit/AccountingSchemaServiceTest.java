@@ -7,11 +7,14 @@ import static org.mockito.BDDMockito.given;
 
 import com.loulysoft.moneytransfer.ratings.entities.EcritureSchemaComptableEntity;
 import com.loulysoft.moneytransfer.ratings.entities.MontantParamSchemaComptableEntity;
+import com.loulysoft.moneytransfer.ratings.entities.MontantSchemaComptableEntity;
+import com.loulysoft.moneytransfer.ratings.entities.SchemaComptableEntity;
 import com.loulysoft.moneytransfer.ratings.mappers.AccountingMapper;
 import com.loulysoft.moneytransfer.ratings.models.EcritureSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.MontantParamSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.MontantSchemaComptable;
 import com.loulysoft.moneytransfer.ratings.models.SchemaComptable;
+import com.loulysoft.moneytransfer.ratings.models.Users;
 import com.loulysoft.moneytransfer.ratings.repositories.EcritureSchemaComptableRepository;
 import com.loulysoft.moneytransfer.ratings.repositories.MontantParamSchemaComptableRepository;
 import com.loulysoft.moneytransfer.ratings.repositories.MontantSchemaComptableRepository;
@@ -21,7 +24,6 @@ import com.loulysoft.moneytransfer.ratings.services.impl.AccountingSchemaService
 import com.loulysoft.moneytransfer.ratings.testdata.TestDataFactory;
 import com.loulysoft.moneytransfer.ratings.utils.Code;
 import com.loulysoft.moneytransfer.ratings.utils.Pivot;
-import com.loulysoft.moneytransfer.ratings.utils.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,6 +65,8 @@ public class AccountingSchemaServiceTest {
 
     private MontantSchemaComptable createdMontantSchema;
 
+    private Users user;
+
     private List<EcritureSchemaComptable> ecritureSchemaList;
 
     private List<MontantParamSchemaComptable> paramSchemaList;
@@ -81,6 +85,7 @@ public class AccountingSchemaServiceTest {
         createdMontantSchema = TestDataFactory.createMontantSchema();
         paramSchemaList = TestDataFactory.getListMontantParamSchemas();
         ecritureSchemaList = TestDataFactory.getListEcritureSchemas();
+        user = TestDataFactory.createUser();
         // ParametreRecherche createdParam = TestDataFactory.createParametreRecherche();
         // when(schemaComptableRepository.readSchemaComptable(anyString(),anyString(),
         // anyString(),anyString())).thenReturn(Optional.ofNullable(schemaComptable));
@@ -89,13 +94,14 @@ public class AccountingSchemaServiceTest {
     @Test
     @Order(1)
     public void readSchemaByServiceCodeAndTypeCodeAndVariantAndStatusTest() {
+        SchemaComptableEntity schemaEntity = accountingMapper.toSchemaComptableEntity(createdSchema);
         // precondition
-        given(schemaRepository.findByServiceCodeAndTypeCodeAndVariantAndStatus(
-                        anyString(), anyString(), anyString(), anyString()))
-                .willReturn(Optional.ofNullable(createdSchema));
+        given(schemaRepository.findByServiceCodeAndTypeCodeAndVariantAndStatusOrderByVersionDesc(
+                        anyString(), anyString(), any(), any()))
+                .willReturn(Optional.ofNullable(schemaEntity));
         // action
-        SchemaComptable schema = accountingSchemaService.readSchemaByServiceCodeAndTypeCodeAndVariantAndStatus(
-                "CASH_TRANSFER", "DISTRIBUTEUR", "A", "VARIANTE_1");
+        SchemaComptable schema =
+                accountingSchemaService.readSchemaByServiceCodeAndTypeCodeAndVariantAndStatus(user, "CASH_TRANSFER");
         // verify the output
         assertThat(schema).isNotNull();
         Assertions.assertEquals(schema.getStatus(), createdSchema.getStatus(), "The schema status should be A");
@@ -104,12 +110,14 @@ public class AccountingSchemaServiceTest {
     @Test
     @Order(2)
     public void readMontantSchemaComptableBySchemaComptableIdTest() {
+        MontantSchemaComptableEntity montantSchemaEntity =
+                accountingMapper.toMontantSchemaComptableEntity(createdMontantSchema);
         // precondition
-
-        given(montantSchemaRepository.findBySchemaId(any())).willReturn(Optional.ofNullable(createdMontantSchema));
+        given(montantSchemaRepository.findBySchemaIdOrderByRangAsc(any()))
+                .willReturn(Optional.ofNullable(montantSchemaEntity));
         // action
         MontantSchemaComptable montantSchema =
-                accountingSchemaService.readMontantSchemaBySchemaComptableId(createdSchema.getId());
+                accountingSchemaService.readMontantSchemaBySchemaId(createdSchema.getId());
         // verify the output
         assertThat(montantSchema).isNotNull();
         Assertions.assertEquals(
@@ -122,12 +130,12 @@ public class AccountingSchemaServiceTest {
         List<MontantParamSchemaComptableEntity> montantParamSchemaList =
                 accountingMapper.asMontantParamSchemaEntities(paramSchemaList);
         // precondition
-        given(montantParamSchemaRepository.findByMontantSchemaIdAndParametreRechercheType(any(), any()))
+        given(montantParamSchemaRepository.findByMontantSchemaIdAndSearchType(any(), any()))
                 .willReturn(montantParamSchemaList);
         // action
         List<MontantParamSchemaComptable> montantParamSchemas =
                 accountingSchemaService.readMontantParamSchemaByMontantSchemaIdAndParametreRechercheType(
-                        createdMontantSchema.getId(), Type.UNITE_ORGANISATIONELLE);
+                        createdMontantSchema.getId());
         // verify the output
         assertThat(montantParamSchemas).isNotNull();
         Assertions.assertEquals(1, montantParamSchemas.size(), "Wrong size");
@@ -158,8 +166,7 @@ public class AccountingSchemaServiceTest {
                 .willReturn(listEcritureSchema);
         // action
         List<EcritureSchemaComptable> ecritureSchema =
-                accountingSchemaService.readEcritureSchemaBySchemaIdAndCodeEcritureCodeIn(
-                        createdSchema.getId(), pivots, Type.UNITE_ORGANISATIONELLE, 0, codes);
+                accountingSchemaService.readEcritureSchemaBySchemaIdAndCodeEcritureCodeIn(user, createdSchema.getId());
         // verify the output
         assertThat(ecritureSchema).isNotNull();
         Assertions.assertEquals(
