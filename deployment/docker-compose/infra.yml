@@ -1,10 +1,10 @@
 version: "3.8"
 #name: 'api-money-transfer'
 services:
-  ###### ratings-db config ###########
-  ratings-db:
+  ###### accounting-db config ###########
+  accounting-db:
     image: postgres:16-alpine
-    container_name: ratings-db
+    container_name: accounting-db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres

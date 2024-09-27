@@ -18,7 +18,7 @@
     </properties>
 
     <modules>
-        <module>ratings-service</module>
+        <module>accounting-service</module>
     </modules>
 
     <build>

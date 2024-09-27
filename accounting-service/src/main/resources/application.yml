@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: accounting-service
+######## Database Configuration  #########
+##### docker compose -f infra.yml up -d
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:15432/postgres}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    open-in-view: false
+    show-sql: true
+
+
+springdoc:
+  api-docs:
+    path: /api-docs
+server:
+  port: 8181
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+     exposure:
+      include: '*'
+  info:
+   git:
+     mode: full
+
+log4j:
+  logger:
+    org:
+      springframework: DEBUG
