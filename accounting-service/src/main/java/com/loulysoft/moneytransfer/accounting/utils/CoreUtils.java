@@ -8,20 +8,19 @@ import com.loulysoft.moneytransfer.accounting.exceptions.NotFoundException;
 import com.loulysoft.moneytransfer.accounting.exceptions.ResourceNotFoundException;
 import com.loulysoft.moneytransfer.accounting.exceptions.TransactionException;
 import com.loulysoft.moneytransfer.accounting.mappers.AccountingMapper;
-import com.loulysoft.moneytransfer.accounting.mappers.OperationMapper;
-import com.loulysoft.moneytransfer.accounting.mappers.TransactionMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.TransactionTmpMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.TransferMapper;
 import com.loulysoft.moneytransfer.accounting.models.Devise;
 import com.loulysoft.moneytransfer.accounting.models.EcritureSchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.Journal;
 import com.loulysoft.moneytransfer.accounting.models.MontantContext;
 import com.loulysoft.moneytransfer.accounting.models.MontantParamSchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.MontantSchemaComptable;
-import com.loulysoft.moneytransfer.accounting.models.Operation;
+import com.loulysoft.moneytransfer.accounting.models.OperationTmp;
 import com.loulysoft.moneytransfer.accounting.models.Pays;
 import com.loulysoft.moneytransfer.accounting.models.TransactionContext;
 import com.loulysoft.moneytransfer.accounting.models.TransactionReport;
 import com.loulysoft.moneytransfer.accounting.models.TypeService;
-import com.loulysoft.moneytransfer.accounting.parametering.utils.CorridorParam;
 import com.loulysoft.moneytransfer.accounting.parametering.utils.IParam;
 import com.loulysoft.moneytransfer.accounting.parametering.utils.ParameterTypes;
 import com.loulysoft.moneytransfer.accounting.repositories.MontantParamSchemaComptableRepository;
@@ -45,11 +44,10 @@ public class CoreUtils {
     private static final String CLASS_NAME_NOT_DEFINED = "Undefined class name with param code {0}";
     private final ApplicationContext context;
     private final DevisesUtils devisesUtils;
-    private final CorridorParam corridorParam;
     private final ParameteringUtils parameteringUtils;
     private final AccountingMapper accountingMapper;
     private final MontantParamSchemaComptableRepository montantParamSchemaComptableRepository;
-    private final OperationMapper operationMapper;
+    private final TransactionTmpMapper transactionTmpMapper;
     private final OperationService operationService;
     private final DeviseService deviseService;
     private final TypeServiceRepository typeServiceRepository;
@@ -65,7 +63,7 @@ public class CoreUtils {
 
         } catch (ClassNotFoundException | ClassCastException e) {
 
-            throw new ResourceNotFoundException(MessageFormat.format(CLASS_NAME_NOT_DEFINED, typeParameter));
+            throw new NotFoundException(MessageFormat.format(CLASS_NAME_NOT_DEFINED, typeParameter));
         }
     }
 
@@ -86,9 +84,9 @@ public class CoreUtils {
         //        String autreParametre = (String) serviceContext.getServiceContext()
         //                .get(ServiceContextItem.AUTRE_PARAMETRE.name());
 
-        var request = TransactionMapper.buildTransactionRequest(
+        var request = TransferMapper.buildTransactionRequest(
                 userId, companyId, schemaComptableId, paysSource, deviseSource.getCode(), transactionContext);
-        var transaction = operationService.createTransaction(request);
+        var transaction = operationService.createTemporaryTransaction(request);
 
         for (MontantSchemaComptable montantSchema : montantSchemaComptables) {
             Pays paysPayer = deviseService.readPaysByCode(paysDest);
@@ -99,7 +97,7 @@ public class CoreUtils {
                 if (montantBase == null) {
                     throw new TransactionException("undefined montantBase parameter error");
                 }
-                Operation operation = operationService.findOperation(transaction.getId(), montantBase.getId());
+                OperationTmp operation = operationService.findOperation(transaction.getId(), montantBase.getId());
                 montantDeBase = operation.getMontant();
             }
 
@@ -151,12 +149,12 @@ public class CoreUtils {
                     montant = devisesUtils.roundMonetaryUnit(montant, devise.getCode());
                 }
             }
-            report.setTransactionId(transaction.getId());
-            var requestOp = TransactionMapper.buildOperationRequest(
+            report.setReference(transaction.getId());
+            var requestOp = TransferMapper.buildOperationRequest(
                     montant,
                     accountingMapper.toMontantSchemaEntity(montantSchema),
-                    operationMapper.toTransactionEntity(transaction));
-            operationService.createOperation(requestOp);
+                    transactionTmpMapper.toEntity(transaction));
+            operationService.createTemporaryOperation(requestOp);
 
             map.put(montantSchema.getId(), montant);
         } // end for
@@ -269,10 +267,10 @@ public class CoreUtils {
             Class<?> clazz = Class.forName(service.getComposant());
 
             return (AbstractRuntimeService<Journal>) context.getBean(clazz);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | ClassCastException e) {
             // TODO Auto-generated catch block
             log.error(e.getMessage(), e);
-            throw new TransactionException("AbstractRuntimeService evaluation error");
+            throw new NotFoundException("AbstractRuntimeService evaluation error");
         }
     }
 }

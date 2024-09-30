@@ -1,7 +1,11 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.loulysoft.moneytransfer.accounting.enums.DebitCredit;
+import jakarta.persistence.Transient;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,51 +16,108 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Journal {
-    // private Transaction transaction;
+
+    private Long id;
+
+    private LocalDateTime createdAt;
+    private Transaction transaction;
+
+    @Builder.Default
     private BigDecimal montant = BigDecimal.ZERO;
 
-    private BigDecimal commissionHorsTax_0 = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal commissionHorsTaxe_0 = BigDecimal.ZERO;
 
-    private BigDecimal commissionTax_0 = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal commissionTaxe_0 = BigDecimal.ZERO;
 
-    private BigDecimal commissionHorsTax_1 = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal commissionHorsTaxe_1 = BigDecimal.ZERO;
 
-    private BigDecimal commissionTax_1 = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal commissionTaxe_1 = BigDecimal.ZERO;
 
-    private BigDecimal commissionHorsTax_2 = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal commissionHorsTaxe_2 = BigDecimal.ZERO;
 
-    private BigDecimal commissionTax_2 = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal commissionTaxe_2 = BigDecimal.ZERO;
 
-    private BigDecimal commissionHorsTax_3 = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal commissionHorsTaxe_3 = BigDecimal.ZERO;
 
-    private BigDecimal commissionTax_3 = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal commissionTaxe_3 = BigDecimal.ZERO;
 
-    private BigDecimal fees = BigDecimal.ZERO;
+    @Builder.Default
+    private BigDecimal frais = BigDecimal.ZERO;
 
+    @Builder.Default
     private BigDecimal timbre = BigDecimal.ZERO;
 
+    @Builder.Default
     private BigDecimal taxes = BigDecimal.ZERO;
 
+    @JsonIgnore
     private UniteOrganisational uniteOrganisational;
-
-    private TypeUniteOrganisational typeUniteOrganisational;
 
     private Devise devise;
 
+    @JsonIgnore
     private DebitCredit typeOperation;
 
+    @JsonIgnore
     private String comment;
 
-    //    private Long usrId;
-    //    private String usrPrenom;
-    //    private String usrNom;
-    //    private String usrUniteOrganisationnelle;
+    @JsonIgnore
+    @Transient
+    private Long usrId;
 
-    //    private String prenomSender;
-    //    private String nomSender;
-    //    private String telSender;
-    //    private String nomBenef;
-    //    private String prenomBenef;
-    //    private String telBenef;
-    //    private Pays paysDest;
+    @JsonIgnore
+    @Transient
+    private String usrPrenom;
+
+    @JsonIgnore
+    @Transient
+    private String usrNom;
+
+    @JsonIgnore
+    @Transient
+    private String usruniteOrganisational;
+
+    @JsonIgnore
+    @Transient
+    private TypeUniteOrganisational typeUniteOrganisational;
+
+    @JsonIgnore
+    @Transient
+    private String prenomSender;
+
+    @JsonIgnore
+    @Transient
+    private String nomSender;
+
+    @JsonIgnore
+    @Transient
+    private String telSender;
+
+    @JsonIgnore
+    @Transient
+    private String nomBenef;
+
+    @JsonIgnore
+    @Transient
+    private String prenomBenef;
+
+    @JsonIgnore
+    @Transient
+    private String telBenef;
+
+    @Transient
+    @JsonProperty(value = "paysDestination")
+    private Pays paysDest;
+
+    @Transient
+    // @JsonProperty(value = "paysSource")
+    private Pays paysOrigine;
 }

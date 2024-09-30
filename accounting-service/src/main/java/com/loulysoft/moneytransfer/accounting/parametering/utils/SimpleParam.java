@@ -6,15 +6,15 @@ import com.loulysoft.moneytransfer.accounting.exceptions.ResourceNotFoundExcepti
 import com.loulysoft.moneytransfer.accounting.exceptions.TransactionException;
 import com.loulysoft.moneytransfer.accounting.mappers.AccountingMapper;
 import com.loulysoft.moneytransfer.accounting.mappers.GrilleMapper;
-import com.loulysoft.moneytransfer.accounting.mappers.OperationMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.TransactionTmpMapper;
 import com.loulysoft.moneytransfer.accounting.models.MontantContext;
-import com.loulysoft.moneytransfer.accounting.models.Transaction;
+import com.loulysoft.moneytransfer.accounting.models.TransactionTmp;
 import com.loulysoft.moneytransfer.accounting.models.UniteOrganisational;
 import com.loulysoft.moneytransfer.accounting.models.ValeurParametre;
 import com.loulysoft.moneytransfer.accounting.repositories.GrilleItemRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.GrilleRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.MontantParamSchemaComptableRepository;
-import com.loulysoft.moneytransfer.accounting.repositories.TransactionRepository;
+import com.loulysoft.moneytransfer.accounting.repositories.TransactionTmpRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.ValeurParametreRepository;
 import com.loulysoft.moneytransfer.accounting.utils.ParameteringUtils;
 import java.math.BigDecimal;
@@ -33,11 +33,11 @@ public class SimpleParam extends CoreParameterUtilities implements IParam {
 
     private final AccountingMapper accountingMapper;
 
-    private final OperationMapper operationMapper;
+    private final TransactionTmpMapper transactionTmpMapper;
 
     private final ValeurParametreRepository valeurParamRepository;
 
-    private final TransactionRepository transactionRepository;
+    private final TransactionTmpRepository transactionTmpRepository;
 
     protected SimpleParam(
             GrilleRepository grilleRepository,
@@ -46,16 +46,16 @@ public class SimpleParam extends CoreParameterUtilities implements IParam {
             MontantParamSchemaComptableRepository montantParamSchemaRepository,
             ParameteringUtils parameteringUtils,
             AccountingMapper accountingMapper,
-            OperationMapper operationMapper,
+            TransactionTmpMapper transactionTmpMapper,
             ValeurParametreRepository valeurParamRepository,
-            TransactionRepository transactionRepository) {
+            TransactionTmpRepository transactionTmpRepository) {
         super(grilleRepository, grilleItemRepository, grilleMapper);
         this.montantParamSchemaRepository = montantParamSchemaRepository;
         this.parameteringUtils = parameteringUtils;
         this.accountingMapper = accountingMapper;
-        this.operationMapper = operationMapper;
+        this.transactionTmpMapper = transactionTmpMapper;
         this.valeurParamRepository = valeurParamRepository;
-        this.transactionRepository = transactionRepository;
+        this.transactionTmpRepository = transactionTmpRepository;
     }
 
     @Override
@@ -63,7 +63,7 @@ public class SimpleParam extends CoreParameterUtilities implements IParam {
         // Grille grille = null;
 
         try {
-            Transaction transaction = operationMapper.toTransaction(transactionRepository
+            TransactionTmp transaction = transactionTmpMapper.toDto(transactionTmpRepository
                     .findById(context.getTransactionId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Transaction with Id " + context.getTransactionId() + " not found")));

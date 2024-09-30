@@ -4,19 +4,23 @@ import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 import com.loulysoft.moneytransfer.accounting.entities.OperationEntity;
-import com.loulysoft.moneytransfer.accounting.entities.TransactionEntity;
 import com.loulysoft.moneytransfer.accounting.models.Operation;
-import com.loulysoft.moneytransfer.accounting.models.Transaction;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
-public interface OperationMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
+public interface OperationMapper extends EntityMapper<Operation, OperationEntity> {
 
-    Operation toOperation(OperationEntity operationEntity);
+    Operation toDto(OperationEntity entity);
 
-    OperationEntity toOperationEntity(Operation operation);
+    OperationEntity toEntity(Operation dto);
 
-    Transaction toTransaction(TransactionEntity transactionEntity);
-
-    TransactionEntity toTransactionEntity(Transaction transaction);
+    default OperationEntity fromId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        OperationEntity operation = new OperationEntity();
+        operation.setId(id);
+        return operation;
+    }
 }

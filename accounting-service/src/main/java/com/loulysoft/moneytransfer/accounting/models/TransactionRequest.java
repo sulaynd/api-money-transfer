@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class TransactionRequest {
     private Long userId;
 
-    private Long schemaComptable;
+    private Long schemaComptableId;
 
     private Long entiteTierceId;
 

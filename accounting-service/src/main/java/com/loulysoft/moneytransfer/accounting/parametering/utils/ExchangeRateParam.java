@@ -6,16 +6,15 @@ import com.loulysoft.moneytransfer.accounting.exceptions.ResourceNotFoundExcepti
 import com.loulysoft.moneytransfer.accounting.exceptions.TransactionException;
 import com.loulysoft.moneytransfer.accounting.mappers.AccountingMapper;
 import com.loulysoft.moneytransfer.accounting.mappers.GrilleMapper;
-import com.loulysoft.moneytransfer.accounting.mappers.OperationMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.TransactionTmpMapper;
 import com.loulysoft.moneytransfer.accounting.models.MontantContext;
 import com.loulysoft.moneytransfer.accounting.models.MontantParamSchemaComptable;
-import com.loulysoft.moneytransfer.accounting.models.Transaction;
+import com.loulysoft.moneytransfer.accounting.models.TransactionTmp;
 import com.loulysoft.moneytransfer.accounting.models.UniteOrganisational;
 import com.loulysoft.moneytransfer.accounting.repositories.GrilleItemRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.GrilleRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.MontantParamSchemaComptableRepository;
-import com.loulysoft.moneytransfer.accounting.repositories.TransactionRepository;
-import com.loulysoft.moneytransfer.accounting.services.DeviseService;
+import com.loulysoft.moneytransfer.accounting.repositories.TransactionTmpRepository;
 import com.loulysoft.moneytransfer.accounting.utils.DevisesUtils;
 import com.loulysoft.moneytransfer.accounting.utils.ParameteringUtils;
 import java.math.BigDecimal;
@@ -31,15 +30,13 @@ public class ExchangeRateParam extends CoreParameterUtilities implements IParam 
 
     private final AccountingMapper accountingMapper;
 
-    private final OperationMapper operationMapper;
-
     private final DevisesUtils devisesUtils;
 
     private final ParameteringUtils parameteringUtils;
 
-    private final DeviseService deviseService;
+    private final TransactionTmpMapper transactionTmpMapper;
 
-    private final TransactionRepository transactionRepository;
+    private final TransactionTmpRepository transactionTmpRepository;
 
     protected ExchangeRateParam(
             GrilleRepository grilleRepository,
@@ -47,19 +44,17 @@ public class ExchangeRateParam extends CoreParameterUtilities implements IParam 
             GrilleMapper grilleMapper,
             MontantParamSchemaComptableRepository montantParamSchemaRepository,
             AccountingMapper accountingMapper,
-            OperationMapper operationMapper,
             DevisesUtils devisesUtils,
             ParameteringUtils parameteringUtils,
-            DeviseService deviseService,
-            TransactionRepository transactionRepository) {
+            TransactionTmpMapper transactionTmpMapper,
+            TransactionTmpRepository transactionTmpRepository) {
         super(grilleRepository, grilleItemRepository, grilleMapper);
         this.montantParamSchemaRepository = montantParamSchemaRepository;
         this.accountingMapper = accountingMapper;
-        this.operationMapper = operationMapper;
         this.devisesUtils = devisesUtils;
         this.parameteringUtils = parameteringUtils;
-        this.deviseService = deviseService;
-        this.transactionRepository = transactionRepository;
+        this.transactionTmpMapper = transactionTmpMapper;
+        this.transactionTmpRepository = transactionTmpRepository;
     }
 
     @Override
@@ -74,7 +69,7 @@ public class ExchangeRateParam extends CoreParameterUtilities implements IParam 
             throw new NotFoundException("Parameter evaluation error");
         }
         try {
-            Transaction transaction = operationMapper.toTransaction(transactionRepository
+            TransactionTmp transaction = transactionTmpMapper.toDto(transactionTmpRepository
                     .findById(context.getTransactionId())
                     .orElseThrow(() -> new ResourceNotFoundException(
                             "Transaction with Id " + context.getTransactionId() + " not found")));

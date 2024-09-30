@@ -9,8 +9,9 @@ import com.loulysoft.moneytransfer.accounting.models.Grille;
 import com.loulysoft.moneytransfer.accounting.models.GrilleItem;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
 public interface GrilleMapper {
 
     Grille toGrille(GrilleEntity grilleEntity);

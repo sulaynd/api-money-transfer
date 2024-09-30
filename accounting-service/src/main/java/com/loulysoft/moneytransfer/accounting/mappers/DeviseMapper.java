@@ -12,8 +12,9 @@ import com.loulysoft.moneytransfer.accounting.models.Devise;
 import com.loulysoft.moneytransfer.accounting.models.ParametreRecherche;
 import com.loulysoft.moneytransfer.accounting.models.Pays;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
 // @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface DeviseMapper {
 

@@ -15,14 +15,17 @@ public class SchemaComptable {
 
     private Character status;
 
+    private Integer version;
+
     private Variant variant;
 
     private String description;
 
     // private String serviceCode;
 
-    private String typeCompany;
+    // private String typeCompany;
 
     private TypeService service;
-    //    private TypeUniteOrganisational type;
+
+    private TypeUniteOrganisational type;
 }

@@ -1,7 +1,6 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
 import com.loulysoft.moneytransfer.accounting.enums.Category;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,5 +21,5 @@ public class TypeCompte {
 
     private Category category;
 
-    private Set<TypeUniteOrganisational> typeUniteOrganisationals = new HashSet<>();
+    private Set<TypeUniteOrganisational> typeUniteOrganisationals;
 }

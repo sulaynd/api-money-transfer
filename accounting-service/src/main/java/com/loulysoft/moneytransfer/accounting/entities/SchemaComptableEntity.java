@@ -52,14 +52,14 @@ public class SchemaComptableEntity {
     //    private String serviceCode;
 
     // @ManyToOne(optional = false)
-    @Column(name = "sc_tuo_code")
-    private String typeCompany;
+    //    @Column(name = "sc_tuo_code")
+    //    private String typeCompany;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "sc_ser_code")
     private TypeServiceEntity service;
-    //
-    //    //@ManyToOne(optional = false)
-    //    @Column(name = "sc_tuo_code")
-    //    private TypeUniteOrganisationalEntity type;
+
+    @ManyToOne
+    @JoinColumn(name = "sc_tuo_code")
+    private TypeUniteOrganisationalEntity type;
 }

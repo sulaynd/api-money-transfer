@@ -17,12 +17,15 @@ create sequence csc_id_seq start with 1000 increment by 1;
 create sequence esc_id_seq start with 1000 increment by 1;
 create sequence vp_id_seq start with 1000 increment by 1;
 create sequence cmsc_id_seq start with 1000 increment by 1;
+create sequence ope_id_seq start with 1000 increment by 1;
 create sequence op_id_seq start with 1000 increment by 1;
+create sequence tra_id_seq start with 1000 increment by 1;
 create sequence trans_id_seq start with 1000 increment by 1;
 create sequence cd_id_seq start with 1000 increment by 1;
 create sequence cmp_id_seq start with 1000 increment by 1;
 create sequence uo_id_seq start with 1000 increment by 1;
 create sequence cdt_id_seq start with 1000 increment by 1;
+create sequence jou_id_seq start with 1000 increment by 1;
 
 create table devise(
     dev_code                        text not null unique,
@@ -283,30 +286,30 @@ create table uo_cours_devise_template(
     PRIMARY KEY (ucdt_cdt_id,ucdt_uo_id)
 );
 
-create table transaction(
-    trans_id                            bigint default nextval('trans_id_seq') not null,
-    trans_user_id                       integer,
-    trans_transaction_id                bigint,
-    trans_entite_tierce_id              integer,
-    trans_company_id                    integer,
-    trans_initial_transaction           integer,
-    trans_devise                        text,
-    trans_pays_destination              text,
-    trans_autre_parametre               text,
-    trans_nature_service                text,
-    trans_pays_source                   text,
-    trans_date                          timestamp,
-    trans_schema_id                     bigint  not null,
+create table transaction_tmp(
+    tra_id                            bigint default nextval('tra_id_seq') not null,
+    tra_user_id                       integer,
+    tra_transaction_id                bigint,
+    tra_entite_tierce_id              integer,
+    tra_company_id                    integer,
+    tra_initial_transaction           integer,
+    tra_devise                        text,
+    tra_pays_destination              text,
+    tra_autre_parametre               text,
+    tra_nature_service                text,
+    tra_pays_source                   text,
+    tra_created_at                    timestamp,
+    tra_schema_id                     bigint  not null,
 
-    PRIMARY KEY (trans_id)
+    PRIMARY KEY (tra_id)
 );
 
-create table operation(
-    op_id                      bigint default nextval('op_id_seq') not null,
-    op_montant                 numeric,
-    op_msc_id                  bigint  not null references montant_schema_comptable(msc_id),
-    op_trans_id                bigint  not null references transaction(trans_id),
-    PRIMARY KEY (op_id)
+create table operation_tmp(
+    ope_id                      bigint default nextval('ope_id_seq') not null,
+    ope_montant                 numeric,
+    ope_msc_id                  bigint  not null references montant_schema_comptable(msc_id),
+    ope_tra_id                bigint  not null references transaction_tmp(tra_id),
+    PRIMARY KEY (ope_id)
 );
 
 create table base_montant_schema_comptable(
@@ -314,6 +317,68 @@ create table base_montant_schema_comptable(
     bmsc_base_id                        bigint ,
 
     PRIMARY KEY (bmsc_msc_id,bmsc_base_id)
+);
+
+
+create table transaction(
+    trans_id                            bigint default nextval('trans_id_seq') not null,
+    trans_status                        char,
+    trans_initial_id                    bigint,
+    trans_annulation                    text,
+    trans_pickup_code                   text,
+    trans_sender_id                     text,
+    trans_receiver_id                   text,
+    trans_log                           text,
+    trans_send_code                     text,
+    trans_retrieved_code                text,
+    trans_created_at                    timestamp,
+    trans_is_notify                      integer,
+    trans_root_id                       bigint  not null references unite_organisational(uo_id),
+    trans_uo_id                         bigint  not null references unite_organisational(uo_id),
+    trans_sc_id                         bigint  not null references schema_comptable(sc_id),
+    trans_dev_code                      text  references devise(dev_code),
+    trans_ser_code                      text references type_service(ser_code),
+
+    PRIMARY KEY (trans_id)
+);
+
+create table operation(
+    op_id                      bigint default nextval('op_id_seq') not null,
+    op_direction                char,
+    op_sequence                 Integer,
+    op_amount                   numeric,
+    op_new_solde                numeric,
+    op_code                     text,
+    op_esc_id                  bigint  not null references ecriture_schema_comptable(esc_id),
+    op_trans_id                 bigint  not null references transaction(trans_id),
+    op_cmp_id                   bigint  not null references compte(cmp_id),
+
+    PRIMARY KEY (op_id)
+);
+
+create table journal(
+    jou_id                            bigint default nextval('jou_id_seq') not null,
+    jou_montant                        numeric,
+    jou_com_ht0                        numeric,
+    jou_com_tax0                        numeric,
+    jou_com_ht1                        numeric,
+    jou_com_tax1                        numeric,
+    jou_com_ht2                        numeric,
+    jou_com_tax2                        numeric,
+    jou_com_ht3                        numeric,
+    jou_com_tax3                        numeric,
+    jou_frais                        numeric,
+    jou_timbre                        numeric,
+    jou_taxes                        numeric,
+    jou_type_operation               text,
+    jou_comment                      text,
+    jou_created_at                    timestamp,
+    jou_trans_id                       bigint  not null references transaction(trans_id),
+    jou_uo_id                         bigint  not null references unite_organisational(uo_id),
+    jou_dev_code                      text  not null references devise(dev_code),
+
+
+    PRIMARY KEY (jou_id)
 );
 
 --CREATE INDEX INDEX_NAME ON TABLE_NAME(COLUMN);

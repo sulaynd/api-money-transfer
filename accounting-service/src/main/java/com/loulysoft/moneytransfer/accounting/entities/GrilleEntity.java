@@ -40,13 +40,6 @@ public class GrilleEntity {
     @Column(name = "grid_type")
     private TypeGrille type;
 
-    //    @OneToMany(mappedBy = "grille")
-    //    @OrderBy("borneInf asc")
-    //    @OneToMany(mappedBy = "grille",
-    //            orphanRemoval = true,
-    //            fetch = FetchType.LAZY,
-    //            cascade = CascadeType.ALL)
-    //    @OrderBy("borneInf asc")
-    //    Set<GrilleItemEntity> paliers = new HashSet<>();
-
+    // @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "grille")
+    // private Set<GrilleItemEntity> paliers;
 }

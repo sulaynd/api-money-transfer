@@ -2,7 +2,6 @@ package com.loulysoft.moneytransfer.accounting.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,6 +13,7 @@ import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
@@ -21,20 +21,38 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "operation")
 public class OperationEntity {
+
     @Id
     @Column(name = "op_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "op_id_generator")
     @SequenceGenerator(name = "op_id_generator", allocationSize = 1, initialValue = 1000, sequenceName = "op_id_seq")
     private Long id;
 
+    @Column(name = "op_direction")
+    private Character direction;
+
+    @Column(name = "op_sequence")
+    private Integer sequence;
+
+    @Column(name = "op_amount", scale = 4)
+    private BigDecimal amount;
+
+    @Column(name = "op_new_solde")
+    private BigDecimal newSolde;
+
+    @ManyToOne
     @JoinColumn(name = "op_trans_id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ToString.Exclude
     private TransactionEntity transaction;
 
-    @JoinColumn(name = "op_msc_id")
-    @ManyToOne(fetch = FetchType.LAZY)
-    private MontantSchemaComptableEntity montantSchema;
+    @ManyToOne
+    @JoinColumn(name = "op_cmp_id")
+    private CompteEntity compte;
 
-    @Column(name = "op_montant", scale = 4)
-    private BigDecimal montant;
+    @Column(name = "op_code")
+    private String code;
+
+    @ManyToOne
+    @JoinColumn(name = "op_esc_id")
+    private EcritureSchemaComptableEntity ecritureSchemaComptable;
 }

@@ -1,5 +1,6 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,9 @@ public class ZoneMonetaire {
 
     private String libelle;
 
+    @JsonIgnore
     private Devise devise;
 
-    UniteOrganisational uniteOrganisational;
+    @JsonIgnore
+    private UniteOrganisational uniteOrganisational;
 }

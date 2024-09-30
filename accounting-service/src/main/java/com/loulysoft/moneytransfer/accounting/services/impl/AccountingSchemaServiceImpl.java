@@ -76,7 +76,8 @@ public class AccountingSchemaServiceImpl implements AccountingSchemaService {
         Character status = 'A';
 
         return accountingMapper.toSchema(schemaRepository
-                .findByServiceCodeAndTypeCompanyAndVariantAndStatusOrderByVersionDesc(
+                // .findByServiceCodeAndTypeCompanyAndVariantAndStatusOrderByVersionDesc
+                .findSchemaByServiceCodeAndTypeCodeAndVariantAndStatusOrderByVersionDesc(
                         serviceCode, type, variant, status)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Account Schema with service " + serviceCode + " and company type " + type + " not found")));

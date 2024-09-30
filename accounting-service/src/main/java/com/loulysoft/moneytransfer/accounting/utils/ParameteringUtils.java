@@ -8,7 +8,7 @@ import com.loulysoft.moneytransfer.accounting.exceptions.TransactionException;
 import com.loulysoft.moneytransfer.accounting.mappers.AccountingMapper;
 import com.loulysoft.moneytransfer.accounting.mappers.CompanyMapper;
 import com.loulysoft.moneytransfer.accounting.mappers.DeviseMapper;
-import com.loulysoft.moneytransfer.accounting.mappers.OperationMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.TransactionTmpMapper;
 import com.loulysoft.moneytransfer.accounting.models.Devise;
 import com.loulysoft.moneytransfer.accounting.models.ParametreRecherche;
 import com.loulysoft.moneytransfer.accounting.models.Pays;
@@ -17,10 +17,9 @@ import com.loulysoft.moneytransfer.accounting.models.ZoneMonetaire;
 import com.loulysoft.moneytransfer.accounting.repositories.DeviseRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.ParametreRechercheRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.PaysRepository;
-import com.loulysoft.moneytransfer.accounting.repositories.TransactionRepository;
+import com.loulysoft.moneytransfer.accounting.repositories.TransactionTmpRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.UniteOrganisationalRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.ZoneMonetaireRepository;
-import com.loulysoft.moneytransfer.accounting.services.DeviseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -32,10 +31,9 @@ public class ParameteringUtils {
 
     private final ParametreRechercheRepository parametreRechercheRepository;
     private final AccountingMapper accountingMapper;
-    private final TransactionRepository transactionRepository;
-    private final OperationMapper operationMapper;
+    private final TransactionTmpRepository transactionTmpRepository;
+    private final TransactionTmpMapper transactionTmpMapper;
     private final DeviseMapper deviseMapper;
-    private final DeviseService deviseService;
     private final PaysRepository paysRepository;
     private final DeviseRepository deviseRepository;
     private final UniteOrganisationalRepository uniteOrganisationalRepository;
@@ -107,7 +105,7 @@ public class ParameteringUtils {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Parameter search with id " + parametreRechercheId + " not found")));
 
-        var transaction = operationMapper.toTransaction(transactionRepository
+        var transaction = transactionTmpMapper.toDto(transactionTmpRepository
                 .findById(transactionId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Transaction with id " + transactionId + " not found")));

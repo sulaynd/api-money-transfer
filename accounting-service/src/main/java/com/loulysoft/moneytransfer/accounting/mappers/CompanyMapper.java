@@ -9,8 +9,9 @@ import com.loulysoft.moneytransfer.accounting.models.PaysRecord;
 import com.loulysoft.moneytransfer.accounting.models.UniteOrganisational;
 import com.loulysoft.moneytransfer.accounting.models.ZoneMonetaire;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
 public interface CompanyMapper {
 
     UniteOrganisational toUniteOrganisational(UniteOrganisationalEntity uniteOrganisationalEntity);

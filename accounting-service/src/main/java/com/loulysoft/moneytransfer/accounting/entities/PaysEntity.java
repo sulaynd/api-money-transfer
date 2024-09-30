@@ -1,5 +1,6 @@
 package com.loulysoft.moneytransfer.accounting.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -42,6 +43,6 @@ public class PaysEntity {
     @JoinColumn(name = "ps_zm_code")
     private ZoneMonetaireEntity zoneMonetaire;
 
-    @OneToMany(mappedBy = "psCode")
+    @OneToMany(mappedBy = "psCode", cascade = CascadeType.ALL)
     private Set<PaysUniteOrganisationalEntity> paysUoIds = new HashSet<>();
 }

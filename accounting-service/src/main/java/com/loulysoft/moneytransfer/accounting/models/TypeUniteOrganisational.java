@@ -1,9 +1,9 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.loulysoft.moneytransfer.accounting.enums.Niveau;
 import com.loulysoft.moneytransfer.accounting.enums.NodeType;
 import com.loulysoft.moneytransfer.accounting.enums.OuiNon;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +24,7 @@ public class TypeUniteOrganisational {
 
     private Niveau niveau;
 
+    @JsonIgnore
     private TypeUniteOrganisational parent;
 
     private NodeType nodeType;
@@ -36,5 +37,6 @@ public class TypeUniteOrganisational {
 
     private Integer hauteur;
 
-    Set<TypeCompte> typesCompte = new HashSet<>();
+    @JsonIgnore
+    Set<TypeCompte> typesCompte;
 }

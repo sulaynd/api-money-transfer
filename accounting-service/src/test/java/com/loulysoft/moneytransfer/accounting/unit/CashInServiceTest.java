@@ -16,6 +16,7 @@ import com.loulysoft.moneytransfer.accounting.models.Users;
 import com.loulysoft.moneytransfer.accounting.services.AccountingSchemaService;
 import com.loulysoft.moneytransfer.accounting.services.CashInService;
 import com.loulysoft.moneytransfer.accounting.services.DeviseService;
+import com.loulysoft.moneytransfer.accounting.services.TransactionService;
 import com.loulysoft.moneytransfer.accounting.services.impl.CashInServiceImpl;
 import com.loulysoft.moneytransfer.accounting.testdata.TestDataFactory;
 import java.math.BigDecimal;
@@ -36,6 +37,8 @@ public class CashInServiceTest {
 
     private CashInService cashInService;
 
+    private TransactionService transactionService;
+
     private TransactionReport report;
 
     private Devise deviseCible;
@@ -44,7 +47,7 @@ public class CashInServiceTest {
 
     private UniteOrganisational company;
 
-    private TypeUniteOrganisational typeUniteOrganisational;
+    private TypeUniteOrganisational type;
 
     private Pays paysSource;
 
@@ -58,10 +61,10 @@ public class CashInServiceTest {
         paysDestination = TestDataFactory.getPays();
         user = TestDataFactory.getUser();
         // typeService = TestDataFactory.getTypeService();
-        typeUniteOrganisational = TestDataFactory.getTypeUniteOrganisational();
+        type = TestDataFactory.getTypeUniteOrganisational();
         paysSource = TestDataFactory.getPays();
         user = TestDataFactory.getUser();
-        cashInService = new CashInServiceImpl(accountingSchemaService, deviseService);
+        cashInService = new CashInServiceImpl(accountingSchemaService, deviseService, transactionService);
     }
 
     @Test

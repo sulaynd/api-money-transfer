@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TransactionContext {
     private Long transactionId;
+
+    @Builder.Default
     private HashMap<TransactionContextItem, Object> context = new HashMap<>();
 
     public void addContextItem(TransactionContextItem item, Object value) {

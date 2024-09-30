@@ -138,7 +138,7 @@ public class TestDataFactory {
                 .variant(Variant.VARIANTE_1)
                 .description("Cena")
                 .service(getTypeService())
-                .typeCompany("DISTRIBUTEUR")
+                .type(getTypeUniteOrganisational())
                 .build();
     }
 

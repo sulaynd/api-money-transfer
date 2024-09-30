@@ -20,6 +20,8 @@ public interface EcritureSchemaComptableRepository extends JpaRepository<Ecritur
     Optional<EcritureSchemaComptableEntity> findBySchemaIdAndWriterCodeAndDirection(
             Long schemaId, Code code, DebitCredit direction);
 
+    List<EcritureSchemaComptableEntity> findBySchemaIdOrderByRang(Long schemaId);
+
     //        @Query(
     //                """
     //                SELECT DISTINCT new

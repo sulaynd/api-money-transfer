@@ -1,25 +1,37 @@
 package com.loulysoft.moneytransfer.accounting.runtime;
 
+import com.loulysoft.moneytransfer.accounting.enums.Code;
+import com.loulysoft.moneytransfer.accounting.enums.DebitCredit;
+import com.loulysoft.moneytransfer.accounting.enums.Mode;
 import com.loulysoft.moneytransfer.accounting.enums.NatureServiceCode;
 import com.loulysoft.moneytransfer.accounting.enums.ServiceContextItem;
 import com.loulysoft.moneytransfer.accounting.enums.TransactionContextItem;
+import com.loulysoft.moneytransfer.accounting.enums.TypeDeCompte;
 import com.loulysoft.moneytransfer.accounting.enums.UniteOrganisationalType;
 import com.loulysoft.moneytransfer.accounting.enums.Variant;
 import com.loulysoft.moneytransfer.accounting.exceptions.ResourceNotFoundException;
 import com.loulysoft.moneytransfer.accounting.exceptions.TransactionException;
 import com.loulysoft.moneytransfer.accounting.exceptions.UnauthorizedException;
 import com.loulysoft.moneytransfer.accounting.mappers.AccountingMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.CompanyMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.OperationMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.TransactionTmpMapper;
 import com.loulysoft.moneytransfer.accounting.models.Devise;
 import com.loulysoft.moneytransfer.accounting.models.Grille;
 import com.loulysoft.moneytransfer.accounting.models.GrilleItem;
 import com.loulysoft.moneytransfer.accounting.models.InfoTransfert;
+import com.loulysoft.moneytransfer.accounting.models.Operation;
 import com.loulysoft.moneytransfer.accounting.models.Pays;
 import com.loulysoft.moneytransfer.accounting.models.PaysRecord;
 import com.loulysoft.moneytransfer.accounting.models.ServiceContext;
 import com.loulysoft.moneytransfer.accounting.models.TransactionContext;
+import com.loulysoft.moneytransfer.accounting.models.TransactionReport;
+import com.loulysoft.moneytransfer.accounting.models.TransactionTmp;
 import com.loulysoft.moneytransfer.accounting.models.UniteOrganisational;
 import com.loulysoft.moneytransfer.accounting.parametering.utils.CorridorParam;
 import com.loulysoft.moneytransfer.accounting.repositories.GrilleItemRepository;
+import com.loulysoft.moneytransfer.accounting.repositories.OperationRepository;
+import com.loulysoft.moneytransfer.accounting.repositories.TransactionTmpRepository;
 import com.loulysoft.moneytransfer.accounting.repositories.UniteOrganisationalRepository;
 import com.loulysoft.moneytransfer.accounting.services.DeviseService;
 import com.loulysoft.moneytransfer.accounting.utils.DevisesUtils;
@@ -43,8 +55,14 @@ public class RuntimeCashTransfer extends AbstractRuntimeService<InfoTransfert> {
     private final AccountingMapper accountingMapper;
     private final GrilleItemRepository grilleItemRepository;
     private final UniteOrganisationalRepository uniteOrganisationalRepository;
+    private final TransactionTmpRepository transactionTmpRepository;
+    private final OperationRepository operationRepository;
     private final DeviseService deviseService;
+    private final OperationMapper operationMapper;
+    private final TransactionTmpMapper transactionTmpMapper;
+    private final CompanyMapper companyMapper;
 
+    // @Override
     public ServiceContext getServiceContext(
             Long companyId,
             Long companyRootId,
@@ -200,5 +218,69 @@ public class RuntimeCashTransfer extends AbstractRuntimeService<InfoTransfert> {
                 throw new TransactionException("Pays de destination invalide");
             }
         }
+    }
+
+    @Override
+    public Class<InfoTransfert> getJournalClass() {
+        return InfoTransfert.class;
+    }
+
+    @Override
+    public TransactionReport preRun(InfoTransfert infoTransfert, TransactionContext transactionContext) {
+
+        TransactionTmp transTmp = transactionTmpMapper.toDto(transactionTmpRepository
+                .findById(transactionContext.getTransactionId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Transaction with Id " + transactionContext.getTransactionId() + " not found")));
+
+        Pays paysDest = deviseService.readPaysByCode(transTmp.getPaysDestination());
+        Pays paysOrigine = deviseService.readPaysByCode(transTmp.getPaysSource());
+
+        Operation operation = operationMapper.toDto(operationRepository
+                .findOperationByCodeAndDirectionAndTransactionIdAndTypeCompte(
+                        Code.ATTENTE_TRANSFERT,
+                        DebitCredit.CREDIT,
+                        infoTransfert.getTransaction().getId(),
+                        TypeDeCompte.ATTENTE.name())
+                .orElseThrow(() -> new ResourceNotFoundException("Operation with Code " + Code.ATTENTE_TRANSFERT
+                        + " and direction " + DebitCredit.CREDIT + " not found")));
+
+        infoTransfert.setMontantRecu(operation.getAmount().abs());
+        // infoTransfert.setDevise(paysOrigine.getZoneMonetaire().getDevise());
+        infoTransfert.setPaysOrigine(paysOrigine);
+        infoTransfert.setPaysDestination(paysDest);
+        // infoTransfert.setDeviseDestination(paysDest.getZoneMonetaire().getDevise());
+        // transactionContext.addContextItem(TransactionContextItem.SENDER_COUNTRY, paysOrigine);
+        // transactionContext.addContextItem(TransactionContextItem.DESTINATION_COUNTRY, paysDest);
+        // transactionContext.addContextItem(TransactionContextItem.DEVISE, paysDest);
+
+        UniteOrganisational partenaireExterne = null;
+        Mode mode = null;
+        String partenaireTransactionId = null;
+        if (transTmp.getEntiteTierceId() != null) {
+            // partenaireExterne = em.find(UniteOrganisationnelle.class, transaction__.getEntiteTierce());
+            partenaireExterne = companyMapper.toUniteOrganisational(uniteOrganisationalRepository
+                    .findById(transTmp.getEntiteTierceId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Company with id " + transTmp.getEntiteTierceId() + " not found")));
+
+            mode = Mode.PUSH;
+
+        } else {
+            UniteOrganisational uniteOrganisationnelle =
+                    companyMapper.toUniteOrganisational(uniteOrganisationalRepository
+                            .findById(transTmp.getCompanyId())
+                            .orElseThrow(() -> new ResourceNotFoundException(
+                                    "Company with id " + transTmp.getEntiteTierceId() + " not found")));
+
+            if (uniteOrganisationnelle.getType().getCode().equals(UniteOrganisationalType.PARTENAIRE_EXTERNE.name())) {
+                partenaireExterne = uniteOrganisationnelle;
+                mode = Mode.PUSH_PARTNER;
+                partenaireTransactionId = (String)
+                        transactionContext.getContextItemValue(TransactionContextItem.PARTENAIRE_TRANSACTION_ID);
+            }
+        }
+
+        return super.preRun(infoTransfert, transactionContext);
     }
 }

@@ -28,19 +28,19 @@ public interface ValeurParametreRepository extends JpaRepository<ValeurParametre
             SELECT g
             FROM  ValeurParametreEntity vp
             JOIN vp.grille g
-            WHERE vp.companyId = :companyId
+            WHERE vp.company.id = :companyId
             AND vp.param.code = :code
-            AND vp.paysCode = :paysSource
+            AND vp.pays.code = :paysSource
         """)
-    Optional<GrilleEntity> findCompanyIdAndCodeAndPaysSource(Long companyId, String code, String paysSource);
+    Optional<GrilleEntity> findGrilleByCompanyIdAndCodeAndPaysSource(Long companyId, String code, String paysSource);
 
     @Query(
             """
             SELECT g
             FROM ValeurParametreEntity vp
             JOIN vp.grille g
-            WHERE vp.companyId = :companyId
+            WHERE vp.company.id = :companyId
             AND vp.param.code = :code
         """)
-    Optional<GrilleEntity> findCompanyIdAndCode(Long companyId, String code);
+    Optional<GrilleEntity> findGrilleByCompanyIdAndCode(Long companyId, String code);
 }

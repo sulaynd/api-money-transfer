@@ -4,6 +4,7 @@ import static org.mapstruct.InjectionStrategy.CONSTRUCTOR;
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
 import com.loulysoft.moneytransfer.accounting.entities.CalculMontantSchemaComptableEntity;
+import com.loulysoft.moneytransfer.accounting.entities.CompteSchemaComptableEntity;
 import com.loulysoft.moneytransfer.accounting.entities.EcritureSchemaComptableEntity;
 import com.loulysoft.moneytransfer.accounting.entities.GrilleEntity;
 import com.loulysoft.moneytransfer.accounting.entities.GrilleItemEntity;
@@ -14,6 +15,7 @@ import com.loulysoft.moneytransfer.accounting.entities.SchemaComptableEntity;
 import com.loulysoft.moneytransfer.accounting.entities.TypeServiceEntity;
 import com.loulysoft.moneytransfer.accounting.entities.ValeurParametreEntity;
 import com.loulysoft.moneytransfer.accounting.models.CalculMontantSchemaComptable;
+import com.loulysoft.moneytransfer.accounting.models.CompteSchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.EcritureSchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.Grille;
 import com.loulysoft.moneytransfer.accounting.models.GrilleItem;
@@ -25,8 +27,9 @@ import com.loulysoft.moneytransfer.accounting.models.TypeService;
 import com.loulysoft.moneytransfer.accounting.models.ValeurParametre;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
 // @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public interface AccountingMapper {
 
@@ -84,4 +87,7 @@ public interface AccountingMapper {
     List<GrilleItem> convertToGrilleItem(List<GrilleItemEntity> grilleItemEntities);
 
     List<GrilleItemEntity> toGrilleItemEntities(List<GrilleItem> grilleItems);
+
+    List<CompteSchemaComptable> convertToCompteSchemaComptable(
+            List<CompteSchemaComptableEntity> compteSchemaComptableEntities);
 }

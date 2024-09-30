@@ -1,6 +1,5 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +18,7 @@ public class CoursDeviseTemplate {
 
     private String description;
 
-    private Set<UniteOrganisational> compagnies = new HashSet<>();
+    private Set<UniteOrganisational> compagnies;
 
     //   private Set<CoursDevise> items = new HashSet<>();
 }

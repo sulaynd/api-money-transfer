@@ -1,5 +1,6 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,10 +15,13 @@ public class Pays {
 
     private String libelle;
 
+    @JsonIgnore
     private Character statut;
 
+    @JsonIgnore
     private String indicatif;
 
+    @JsonIgnore
     private String language;
 
     private ZoneMonetaire zoneMonetaire;

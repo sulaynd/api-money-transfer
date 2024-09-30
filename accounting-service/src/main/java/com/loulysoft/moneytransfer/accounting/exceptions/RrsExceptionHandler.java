@@ -44,7 +44,8 @@ public class RrsExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<ErrorResponse> handleNotAuthorizedException(UnauthorizedException exception) {
-        return buildErrorResponse(exception);
+        // return buildErrorResponse(exception);
+        return buildErrorResponse(mapToRrsException(exception, HttpStatus.UNAUTHORIZED));
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -102,8 +103,14 @@ public class RrsExceptionHandler {
 
     @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<ErrorResponse> handleConflictException(RrsException rrsException) {
-        return buildErrorResponse(rrsException);
+    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException exception) {
+        return buildErrorResponse(mapToRrsException(exception, HttpStatus.CONFLICT));
+    }
+
+    @ExceptionHandler(ForbiddenActionException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ErrorResponse> handleForbiddenActionException(ForbiddenActionException exception) {
+        return buildErrorResponse(mapToRrsException(exception, HttpStatus.FORBIDDEN));
     }
 
     private RrsException mapToRrsException(Exception e, HttpStatus httpStatus) {

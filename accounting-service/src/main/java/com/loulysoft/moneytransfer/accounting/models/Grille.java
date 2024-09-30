@@ -20,5 +20,5 @@ public class Grille {
 
     private TypeGrille type;
 
-    //    Set<GrilleItem> paliers = new HashSet<>();
+    // private Set<GrilleItem> paliers;
 }

@@ -9,6 +9,7 @@ import com.loulysoft.moneytransfer.accounting.models.TransactionReport;
 import com.loulysoft.moneytransfer.accounting.services.AccountingSchemaService;
 import com.loulysoft.moneytransfer.accounting.services.CashInService;
 import com.loulysoft.moneytransfer.accounting.services.DeviseService;
+import com.loulysoft.moneytransfer.accounting.services.TransactionService;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class CashInServiceImpl implements CashInService {
     private final AccountingSchemaService accountingSchemaService;
 
     private final DeviseService deviseService;
+    private final TransactionService transactionService;
 
     private TransactionReport report;
 
@@ -43,7 +45,14 @@ public class CashInServiceImpl implements CashInService {
         report = accountingSchemaService.demarrerTransaction(
                 userId, companyId, paysDest, serviceCode, transactionContext);
 
-        log.info("calculatePrincipalAndCommissionsByTotal - report :" + report);
+        //        TransactionReport transactionReport =
+        //                transactionService.finaliserTransaction(userId, companyId, report.getTransactionId());
+        //        transactionReport.setPrincipal(report.getPrincipal());
+        //        transactionReport.setTotal(report.getTotal());
+        //        transactionReport.setCommissions(report.getCommissions());
+        //        transactionReport.setRate(report.getRate());
+
+        log.info("calculatePrincipalAndCommissionsByTotal - report :{}", report);
     }
 
     private void calculatePrincipalAndCommissionsByReceivedAmount(
@@ -53,7 +62,7 @@ public class CashInServiceImpl implements CashInService {
         transactionContext.addContextItem(TransactionContextItem.PRINCIPAL_CONVERTI, inputAmount);
         report = accountingSchemaService.demarrerTransaction(
                 userId, companyId, paysDest, serviceCode, transactionContext);
-        log.info("calculatePrincipalAndCommissionsByReceivedAmount - report : " + report);
+        log.info("calculatePrincipalAndCommissionsByReceivedAmount - report : {}", report);
     }
 
     @Override
@@ -104,7 +113,7 @@ public class CashInServiceImpl implements CashInService {
                             report = accountingSchemaService.demarrerTransaction(
                                     userId, companyId, paysReceiver, serviceCode, transactionContext);
 
-                            log.info("report -------- " + report);
+                            log.info("report -------- {}", report);
                         }
                     }
                 }

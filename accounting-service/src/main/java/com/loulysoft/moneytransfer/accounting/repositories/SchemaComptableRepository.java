@@ -20,7 +20,7 @@ public interface SchemaComptableRepository extends JpaRepository<SchemaComptable
     //        AND s.status =:status
     //        ORDER BY s.version desc
     //        """)
-    Optional<SchemaComptableEntity> findByServiceCodeAndTypeCompanyAndVariantAndStatusOrderByVersionDesc(
+    Optional<SchemaComptableEntity> findByServiceCodeAndTypeCodeAndVariantAndStatusOrderByVersionDesc(
             String serviceCode, String type, Variant variant, Character status);
 
     @Query(
@@ -28,11 +28,11 @@ public interface SchemaComptableRepository extends JpaRepository<SchemaComptable
             SELECT sc
             FROM SchemaComptableEntity sc
             WHERE sc.service.code =:serviceCode
-            AND sc.typeCompany =:typeCompany
+            AND sc.type.code =:type
             AND sc.status = :status
             AND sc.variant = :variant
             ORDER BY sc.version DESC
             """)
-    Optional<SchemaComptableEntity> findServiceCodeAndTypeCompanyAndVariantAndStatusOrderByVersionDesc(
-            String serviceCode, String typeCompany, Variant variant, Character status);
+    Optional<SchemaComptableEntity> findSchemaByServiceCodeAndTypeCodeAndVariantAndStatusOrderByVersionDesc(
+            String serviceCode, String type, Variant variant, Character status);
 }

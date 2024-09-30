@@ -1,5 +1,6 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +19,7 @@ public class CompteSchemaComptable {
     private ParametreRecherche search;
 
     private TypeCompte typeCompte;
-    ;
+
+    @Transient
+    private Long compteId;
 }
