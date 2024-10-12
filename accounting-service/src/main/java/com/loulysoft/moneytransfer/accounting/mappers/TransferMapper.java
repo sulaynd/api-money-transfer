@@ -1,7 +1,6 @@
 package com.loulysoft.moneytransfer.accounting.mappers;
 
 import com.loulysoft.moneytransfer.accounting.entities.MontantSchemaComptableEntity;
-import com.loulysoft.moneytransfer.accounting.entities.OperationTmpEntity;
 import com.loulysoft.moneytransfer.accounting.entities.TransactionTmpEntity;
 import com.loulysoft.moneytransfer.accounting.enums.OuiNon;
 import com.loulysoft.moneytransfer.accounting.enums.TransactionContextItem;
@@ -18,33 +17,6 @@ import com.loulysoft.moneytransfer.accounting.models.UniteOrganisational;
 import java.math.BigDecimal;
 
 public class TransferMapper {
-
-    public static TransactionTmpEntity convertToEntity(TransactionRequest request) {
-        TransactionTmpEntity newTransaction = new TransactionTmpEntity();
-        newTransaction.setSchemaComptableId(request.getSchemaComptableId());
-        newTransaction.setUserId(request.getUserId());
-        newTransaction.setAutreParametre(request.getAutreParametre());
-        newTransaction.setNatureService(request.getNatureService());
-        newTransaction.setInitialTransaction(request.getInitialTransaction());
-        newTransaction.setDevise(request.getDevise());
-        newTransaction.setPaysDestination(request.getPaysDestination());
-        newTransaction.setPaysSource(request.getPaysSource());
-        newTransaction.setAutreParametre(request.getAutreParametre());
-        newTransaction.setInitialTransaction(request.getInitialTransaction());
-        newTransaction.setCompanyId(request.getCompanyId());
-        newTransaction.setEntiteTierceId(request.getEntiteTierceId());
-
-        return newTransaction;
-    }
-
-    public static OperationTmpEntity convertToEntity(OperationRequest request) {
-        OperationTmpEntity newOperation = new OperationTmpEntity();
-        newOperation.setTransaction(request.getTransaction());
-        newOperation.setMontantSchema(request.getMontantSchema());
-        newOperation.setMontant(request.getMontant());
-
-        return newOperation;
-    }
 
     public static TransactionRequest buildTransactionRequest(
             Long userId,

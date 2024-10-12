@@ -2,6 +2,7 @@ package com.loulysoft.moneytransfer.accounting.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,9 @@ public class TransactionReport {
 
     private Long reference;
 
-    // private LocalDateTime createdAt;
+    private LocalDateTime createdAt;
+
+    private Long transactionId;
 
     @JsonIgnore
     private TypeService service;
@@ -68,6 +71,7 @@ public class TransactionReport {
     private String uoParentName;
 
     private String uoRootName;
-    //    @Builder.Default
-    //    private boolean cancelable = false, updatable = false;
+
+    @Builder.Default
+    private boolean cancelable = false, updatable = false;
 }

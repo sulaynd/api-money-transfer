@@ -1466,7 +1466,7 @@ insert into compte(cmp_id,cmp_dernier_mouvement,cmp_max_solde,cmp_min_solde,cmp_
 (1516,  '2019-05-22 11:07:50.630',null  ,null  ,  -2973.00,  1243,  'TIERS'),
 (1021,  '2019-05-20 22:28:55.857',null  ,null  ,  -466.00,  1010,  'TIERS'),
 (1517,  '2019-05-22 11:07:50.630',null  ,null  ,  -8964.00,  1243,  'COURANT'),
-(1561,  '2019-05-31 16:18:41.388',null  ,null  ,  -412.00,  1269,  'COURANT'),
+(1561,  '2019-05-31 16:18:41.388',null  ,null  ,  0,  1269,  'COURANT'),
 (1066,  null,  null,  null,  0.00,  1020,  'OPERATION'),
 (1639,  '2019-06-04 09:29:53.567',null  ,null  ,  -5637.00,  1307,  'COURANT'),
 (1565,  '2019-06-01 21:42:01.606',null  ,null  ,  -14210.00,  1271,  'COURANT'),

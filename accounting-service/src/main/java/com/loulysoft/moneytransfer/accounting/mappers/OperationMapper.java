@@ -11,6 +11,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = SPRING, injectionStrategy = CONSTRUCTOR)
 public interface OperationMapper extends EntityMapper<Operation, OperationEntity> {
 
+    // @Mappings({@Mapping(target = "transaction.operations", ignore = true)})
     Operation toDto(OperationEntity entity);
 
     OperationEntity toEntity(Operation dto);

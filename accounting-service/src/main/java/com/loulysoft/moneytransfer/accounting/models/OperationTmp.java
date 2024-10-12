@@ -1,5 +1,6 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +15,7 @@ public class OperationTmp {
 
     private Long id;
 
+    @JsonIgnore
     private TransactionTmp transaction;
 
     private MontantSchemaComptable montantSchema;

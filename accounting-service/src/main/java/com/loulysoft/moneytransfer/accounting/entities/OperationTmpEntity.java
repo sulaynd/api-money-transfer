@@ -14,11 +14,11 @@ import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+// https://www.youtube.com/watch?v=6aVZkoOZqFk
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "operation_tmp")
 public class OperationTmpEntity {
@@ -28,13 +28,12 @@ public class OperationTmpEntity {
     @SequenceGenerator(name = "ope_id_generator", allocationSize = 1, initialValue = 1000, sequenceName = "ope_id_seq")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ope_tra_id")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @ToString.Exclude
     private TransactionTmpEntity transaction;
 
     @JoinColumn(name = "ope_msc_id")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private MontantSchemaComptableEntity montantSchema;
 
     @Column(name = "ope_montant", scale = 4)

@@ -6,7 +6,7 @@ import com.loulysoft.moneytransfer.accounting.enums.Mode;
 import com.loulysoft.moneytransfer.accounting.enums.NatureServiceCode;
 import com.loulysoft.moneytransfer.accounting.enums.ServiceContextItem;
 import com.loulysoft.moneytransfer.accounting.enums.TransactionContextItem;
-import com.loulysoft.moneytransfer.accounting.enums.TypeDeCompte;
+import com.loulysoft.moneytransfer.accounting.enums.TypeCompte;
 import com.loulysoft.moneytransfer.accounting.enums.UniteOrganisationalType;
 import com.loulysoft.moneytransfer.accounting.enums.Variant;
 import com.loulysoft.moneytransfer.accounting.exceptions.ResourceNotFoundException;
@@ -241,7 +241,7 @@ public class RuntimeCashTransfer extends AbstractRuntimeService<InfoTransfert> {
                         Code.ATTENTE_TRANSFERT,
                         DebitCredit.CREDIT,
                         infoTransfert.getTransaction().getId(),
-                        TypeDeCompte.ATTENTE.name())
+                        TypeCompte.ATTENTE.name())
                 .orElseThrow(() -> new ResourceNotFoundException("Operation with Code " + Code.ATTENTE_TRANSFERT
                         + " and direction " + DebitCredit.CREDIT + " not found")));
 

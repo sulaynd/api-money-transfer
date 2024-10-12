@@ -4,14 +4,14 @@ import java.util.List;
 
 public interface EntityMapper<D, E> {
 
-    public E toEntity(D dto);
+    E toEntity(D dto);
 
-    public D toDto(E entity);
+    D toDto(E entity);
 
-    public List<E> toEntityList(List<D> dtoList);
+    List<D> toDtoList(List<E> entityList);
 
-    public List<D> toDtoList(List<E> entityList);
+    // List<E> toEntityList(List<D> dtoList);
 
-    // public Set<E> toEntitySet(Set<D> dtoSet);
-    // public Set <D> toDtoSet(Set<E> entitySet);
+    // Set<E> toEntitySet(Set<D> dtoSet);
+    // Set<D> toDtoSet(Set<E> entitySet);
 }

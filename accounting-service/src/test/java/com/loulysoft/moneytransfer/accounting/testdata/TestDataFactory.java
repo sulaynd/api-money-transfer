@@ -1,11 +1,13 @@
 package com.loulysoft.moneytransfer.accounting.testdata;
 
 import static java.time.LocalDateTime.now;
+import static org.instancio.Select.field;
 
 import com.loulysoft.moneytransfer.accounting.enums.Code;
 import com.loulysoft.moneytransfer.accounting.enums.DebitCredit;
 import com.loulysoft.moneytransfer.accounting.enums.Niveau;
 import com.loulysoft.moneytransfer.accounting.enums.NodeType;
+import com.loulysoft.moneytransfer.accounting.enums.OuiNon;
 import com.loulysoft.moneytransfer.accounting.enums.Pivot;
 import com.loulysoft.moneytransfer.accounting.enums.Round;
 import com.loulysoft.moneytransfer.accounting.enums.Type;
@@ -13,6 +15,7 @@ import com.loulysoft.moneytransfer.accounting.enums.Variant;
 import com.loulysoft.moneytransfer.accounting.models.CodeEcriture;
 import com.loulysoft.moneytransfer.accounting.models.Compte;
 import com.loulysoft.moneytransfer.accounting.models.CompteSchemaComptable;
+import com.loulysoft.moneytransfer.accounting.models.CreateTransactionRequest;
 import com.loulysoft.moneytransfer.accounting.models.Devise;
 import com.loulysoft.moneytransfer.accounting.models.EcritureSchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.MontantParamSchemaComptable;
@@ -34,8 +37,26 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.instancio.Instancio;
 
 public class TestDataFactory {
+
+    public static CreateTransactionRequest createValidTransactionRequest(Long userId, Long companyId, Long reference) {
+        return Instancio.of(CreateTransactionRequest.class)
+                .set(field(CreateTransactionRequest::userId), userId)
+                .set(field(CreateTransactionRequest::companyId), companyId)
+                .set(field(CreateTransactionRequest::reference), reference)
+                .create();
+    }
+
+    public static CreateTransactionRequest createTransactionRequestWithInvalidReference(
+            Long userId, Long companyId, Long reference) {
+        return Instancio.of(CreateTransactionRequest.class)
+                .set(field(CreateTransactionRequest::userId), userId)
+                .set(field(CreateTransactionRequest::companyId), companyId)
+                .set(field(CreateTransactionRequest::reference), reference)
+                .create();
+    }
 
     public static Devise getDevise() {
 
@@ -126,7 +147,7 @@ public class TestDataFactory {
         return TypeService.builder()
                 .code("CASH_TRANSFER")
                 .composant("")
-                .decouvert_applicable("OUI")
+                .decouvertApplicable(OuiNon.OUI)
                 .description("Envoi cash")
                 .build();
     }

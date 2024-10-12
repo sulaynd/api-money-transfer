@@ -1,7 +1,10 @@
 package com.loulysoft.moneytransfer.accounting.entities;
 
+import com.loulysoft.moneytransfer.accounting.enums.OuiNon;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
@@ -26,6 +29,7 @@ public class TypeServiceEntity {
     @Column(name = "ser_composant")
     private String composant;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "ser_decouvert_applicable")
-    private String decouvert_applicable;
+    private OuiNon decouvertApplicable;
 }

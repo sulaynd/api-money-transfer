@@ -3,20 +3,28 @@ package com.loulysoft.moneytransfer.accounting.services.impl;
 import com.loulysoft.moneytransfer.accounting.enums.Code;
 import com.loulysoft.moneytransfer.accounting.enums.DebitCredit;
 import com.loulysoft.moneytransfer.accounting.enums.Pivot;
+import com.loulysoft.moneytransfer.accounting.enums.Round;
 import com.loulysoft.moneytransfer.accounting.enums.ServiceContextItem;
 import com.loulysoft.moneytransfer.accounting.enums.TransactionContextItem;
 import com.loulysoft.moneytransfer.accounting.enums.Type;
 import com.loulysoft.moneytransfer.accounting.enums.UniteOrganisationalType;
 import com.loulysoft.moneytransfer.accounting.enums.Variant;
+import com.loulysoft.moneytransfer.accounting.exceptions.InvalidAmountException;
 import com.loulysoft.moneytransfer.accounting.exceptions.NotFoundException;
 import com.loulysoft.moneytransfer.accounting.exceptions.ResourceNotFoundException;
+import com.loulysoft.moneytransfer.accounting.exceptions.TransactionException;
 import com.loulysoft.moneytransfer.accounting.mappers.AccountingMapper;
 import com.loulysoft.moneytransfer.accounting.mappers.CompanyMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.TransactionTmpMapper;
+import com.loulysoft.moneytransfer.accounting.mappers.TransferMapper;
+import com.loulysoft.moneytransfer.accounting.models.Devise;
 import com.loulysoft.moneytransfer.accounting.models.EcritureSchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.Journal;
+import com.loulysoft.moneytransfer.accounting.models.MontantContext;
 import com.loulysoft.moneytransfer.accounting.models.MontantParamSchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.MontantSchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.MontantSchemaRecord;
+import com.loulysoft.moneytransfer.accounting.models.OperationTmp;
 import com.loulysoft.moneytransfer.accounting.models.Pays;
 import com.loulysoft.moneytransfer.accounting.models.SchemaComptable;
 import com.loulysoft.moneytransfer.accounting.models.ServiceContext;
@@ -31,7 +39,11 @@ import com.loulysoft.moneytransfer.accounting.repositories.UniteOrganisationalRe
 import com.loulysoft.moneytransfer.accounting.runtime.AbstractRuntimeService;
 import com.loulysoft.moneytransfer.accounting.services.AccountingSchemaService;
 import com.loulysoft.moneytransfer.accounting.services.DeviseService;
+import com.loulysoft.moneytransfer.accounting.services.OperationService;
+import com.loulysoft.moneytransfer.accounting.services.TransactionService;
 import com.loulysoft.moneytransfer.accounting.utils.CoreUtils;
+import com.loulysoft.moneytransfer.accounting.utils.DevisesUtils;
+import com.loulysoft.moneytransfer.accounting.utils.ParameteringUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = false)
+@Transactional
 public class AccountingSchemaServiceImpl implements AccountingSchemaService {
 
     private final SchemaComptableRepository schemaRepository;
@@ -62,9 +74,19 @@ public class AccountingSchemaServiceImpl implements AccountingSchemaService {
 
     private final DeviseService deviseService;
 
+    private final TransactionService transactionService;
+
+    private final OperationService operationService;
+
     private final CompanyMapper companyMapper;
 
+    private final TransactionTmpMapper transactionTmpMapper;
+
     private final CoreUtils coreUtils;
+
+    private final ParameteringUtils parameteringUtils;
+
+    private final DevisesUtils devisesUtils;
 
     @Override
     @Transactional(readOnly = true)
@@ -146,6 +168,127 @@ public class AccountingSchemaServiceImpl implements AccountingSchemaService {
     }
 
     @Override
+    public void readMontantSchemaComptables(
+            Long userId,
+            Long schemaComptableId,
+            List<MontantSchemaComptable> montantSchemaComptables,
+            String paysSource,
+            Devise deviseSource,
+            Long companyId,
+            TransactionContext transactionContext,
+            HashMap<Long, BigDecimal> map,
+            TransactionReport report) {
+
+        String paysDest = (String) transactionContext.getContextItemValue(TransactionContextItem.DESTINATION_COUNTRY);
+        String natureServiceCode =
+                (String) transactionContext.getContextItemValue(TransactionContextItem.NATURE_SERVICE);
+        //        String autreParametre = (String) serviceContext.getServiceContext()
+        //                .get(ServiceContextItem.AUTRE_PARAMETRE.name());
+
+        var request = TransferMapper.buildTransactionRequest(
+                userId, companyId, schemaComptableId, paysSource, deviseSource.getCode(), transactionContext);
+        var transaction = transactionService.createTemporaryTransaction(request);
+
+        for (MontantSchemaComptable montantSchema : montantSchemaComptables) {
+            Pays paysPayer = deviseService.readPaysByCode(paysDest);
+            BigDecimal montantDeBase = BigDecimal.ZERO;
+            if (!montantSchema.getMontantSchemaComptables().isEmpty()) {
+                MontantSchemaComptable montantBase =
+                        montantSchema.getMontantSchemaComptables().iterator().next();
+                if (montantBase == null) {
+                    throw new TransactionException("undefined montantBase parameter error");
+                }
+                OperationTmp operation = operationService.findOperation(transaction.getId(), montantBase.getId());
+                montantDeBase = operation.getMontant();
+            }
+
+            var context = new MontantContext(
+                    transaction.getId(),
+                    montantSchema.getId(),
+                    paysPayer.getCode(),
+                    null,
+                    companyId,
+                    paysSource,
+                    montantDeBase,
+                    transactionContext);
+
+            context.getTransactionContext().setTransactionId(transaction.getId());
+
+            var codeParam = montantSchema.getParam().getTypeParametre().getCode();
+            var iParam = coreUtils.getParamComponent(codeParam);
+            BigDecimal montant = iParam.getValeurMontant(context);
+
+            if (montant == null || montant.compareTo(BigDecimal.ZERO) < 0) {
+                throw new InvalidAmountException("Invalid amount value");
+            }
+            if (codeParam.equalsIgnoreCase("EXCHANGE_RATE")) {
+                transactionContext.addContextItem(TransactionContextItem.TAUX_CHANGE, montant);
+            }
+            List<MontantParamSchemaComptable> montantParamSchemaComptables =
+                    accountingMapper.convertToMontantParamSchema(
+                            montantParamSchemaComptableRepository.findByMontantSchemaIdAndSearchType(
+                                    montantSchema.getId(), Type.DEVISE));
+            if (montantParamSchemaComptables.size() > 1) {
+                throw new NotFoundException("Undefined accounting param schema amount");
+            }
+
+            var devise = deviseSource;
+            if (!montantParamSchemaComptables.isEmpty()) {
+                var parametreRecherche = montantParamSchemaComptables.getFirst().getSearch();
+                devise = parameteringUtils.chercherDevise(parametreRecherche.getId(), companyId, transaction.getId());
+            }
+
+            var round = Round.UNIT;
+            if (montantSchema.getRound() != null) {
+                round = montantSchema.getRound();
+            }
+
+            if (round.compareTo(Round.NONE) != 0) {
+                if (round.compareTo(Round.UNIT) == 0) {
+                    montant = devisesUtils.roundUnit(montant, devise.getCode());
+                } else {
+                    montant = devisesUtils.roundMonetaryUnit(montant, devise.getCode());
+                }
+            }
+            report.setReference(transaction.getId());
+            var requestOp = TransferMapper.buildOperationRequest(
+                    montant,
+                    accountingMapper.toMontantSchemaEntity(montantSchema),
+                    transactionTmpMapper.toEntity(transaction));
+            operationService.createTemporaryOperation(requestOp);
+
+            map.put(montantSchema.getId(), montant);
+        } // end for
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void readEcritureSchemaComptables(
+            List<EcritureSchemaComptable> ecritureSchemaComptables,
+            TransactionReport report,
+            HashMap<Long, BigDecimal> map) {
+
+        for (EcritureSchemaComptable rs : ecritureSchemaComptables) {
+            Long montantSchemaComptableId = rs.getMontantSchema().getId();
+            var codeEcriture = rs.getWriter();
+            var amount = map.get(montantSchemaComptableId);
+            if (amount == null) {
+                amount = new BigDecimal(0);
+            }
+            // amount == null ? new BigDecimal(0): new BigDecimal(amount);
+            if (codeEcriture.getCode().compareTo(Code.PRINCIPAL) == 0) {
+                report.setMontant(amount);
+            } else if (codeEcriture.getCode().compareTo(Code.TAXES) == 0) {
+                report.setTaxes(amount);
+            } else if (codeEcriture.getCode().compareTo(Code.TIMBRE) == 0) {
+                report.setTimbre(amount);
+            } else {
+                report.setFrais(report.getFrais().add(amount));
+            }
+        }
+    }
+
+    @Override
     public TransactionReport demarrerTransaction(
             Long userId, Long companyId, Pays paysPayer, String serviceCode, TransactionContext transactionContext) {
         UniteOrganisational company = companyMapper.toUniteOrganisational(uniteOrganisationalRepository
@@ -202,7 +345,7 @@ public class AccountingSchemaServiceImpl implements AccountingSchemaService {
             throw new NotFoundException("Undefined accounting schema amount for schema :" + schema.getId());
         }
 
-        coreUtils.readMontantSchemaComptables(
+        readMontantSchemaComptables(
                 userId,
                 schema.getId(),
                 montantSchemaComptables,
@@ -225,7 +368,7 @@ public class AccountingSchemaServiceImpl implements AccountingSchemaService {
             throw new NotFoundException("Undefined writer accounting schema");
         }
 
-        coreUtils.readEcritureSchemaComptables(ecritureSchemaComptables, report, map);
+        readEcritureSchemaComptables(ecritureSchemaComptables, report, map);
 
         if (serviceCode.equals("CASH_TRANSFER")) {
             MontantSchemaRecord request =

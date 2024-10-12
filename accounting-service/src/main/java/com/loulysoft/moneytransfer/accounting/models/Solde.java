@@ -27,4 +27,12 @@ public class Solde {
     private BigDecimal decouvert;
 
     private boolean visible;
+
+    public Solde(Long compteId, BigDecimal valeur, BigDecimal disponible, String devise) {
+        super();
+        this.compteId = compteId;
+        this.valeur = valeur;
+        this.disponible = disponible;
+        this.devise = devise;
+    }
 }

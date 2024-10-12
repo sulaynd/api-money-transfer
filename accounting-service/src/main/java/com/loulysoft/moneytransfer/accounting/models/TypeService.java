@@ -1,5 +1,6 @@
 package com.loulysoft.moneytransfer.accounting.models;
 
+import com.loulysoft.moneytransfer.accounting.enums.OuiNon;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +14,5 @@ public class TypeService {
     private String code;
     private String description;
     private String composant;
-    private String decouvert_applicable;
+    private OuiNon decouvertApplicable;
 }

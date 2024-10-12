@@ -10,9 +10,11 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional(readOnly = true)
 public class GrilleServiceImpl implements GrilleService {
 
     private final GrilleItemRepository grilleItemRepository;

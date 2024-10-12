@@ -16,7 +16,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -89,12 +88,13 @@ public class TransactionEntity {
     // private TransactionReportCategory reportCategory;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "transaction")
-    private Set<OperationEntity> operations = new HashSet<>();
+    private Set<OperationEntity> operations;
     //    private Set<InterventionTransaction> interventions = new HashSet<InterventionTransaction>();
     //
     //    private Set<TransactionPropertyItem> rtProperties = new HashSet<TransactionPropertyItem>();
     //
-    //    private Set<TransactionMouvementSolde> transactionMouvementSoldes = new HashSet<>();
+    @OneToMany(mappedBy = "transaction")
+    private Set<TransactionMouvementSoldeEntity> transactionMouvementSoldes;
 
     //    @ManyToMany(fetch = FetchType.LAZY)
     //    @JoinTable(name = "TRANSACTION_RELATION", joinColumns = {

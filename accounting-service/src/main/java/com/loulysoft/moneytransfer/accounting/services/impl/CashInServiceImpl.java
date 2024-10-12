@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = false)
+@Transactional
 public class CashInServiceImpl implements CashInService {
 
     private final AccountingSchemaService accountingSchemaService;

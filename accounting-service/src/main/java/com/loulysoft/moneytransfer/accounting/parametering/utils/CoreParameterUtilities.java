@@ -29,7 +29,7 @@ public abstract class CoreParameterUtilities {
 
     public BigDecimal getValueInGrille(Long grilleId, BigDecimal base) {
 
-        BigDecimal value = null;
+        BigDecimal value = BigDecimal.ZERO;
 
         GrilleItem grilleItem = grilleMapper.toGrilleItem(grilleItemRepository
                 .findGrilleIdAndBorneInfLessThanEqualAndBorneSupGreaterThanEqualOrderByBorneInfAsc(grilleId, base)

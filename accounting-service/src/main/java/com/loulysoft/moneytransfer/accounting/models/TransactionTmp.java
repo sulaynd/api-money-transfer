@@ -44,4 +44,10 @@ public class TransactionTmp {
     private String natureService;
 
     private String paysSource;
+    //    public void setOperations(Set<OperationTmp> ops) {
+    //        this.operations.clear();
+    //        if (ops != null) {
+    //            this.operations.addAll(ops);
+    //        }
+    //    }
 }

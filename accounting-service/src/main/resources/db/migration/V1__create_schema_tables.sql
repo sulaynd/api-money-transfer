@@ -308,7 +308,7 @@ create table operation_tmp(
     ope_id                      bigint default nextval('ope_id_seq') not null,
     ope_montant                 numeric,
     ope_msc_id                  bigint  not null references montant_schema_comptable(msc_id),
-    ope_tra_id                bigint  not null references transaction_tmp(tra_id),
+    ope_tra_id                  bigint  not null references transaction_tmp(tra_id) ON DELETE CASCADE,
     PRIMARY KEY (ope_id)
 );
 
@@ -381,8 +381,22 @@ create table journal(
     PRIMARY KEY (jou_id)
 );
 
+create table TRANSACTION_MOUVEMENT_SOLDE(
+    TMS_STATUS                  text not null,
+    TMS_CRITICITE               text not null,
+    TMS_TRANS_ID                bigint not null references transaction(trans_id),
+    TMS_DATE                    timestamp,
+    PRIMARY KEY (TMS_CRITICITE,TMS_TRANS_ID)
+);
+
 --CREATE INDEX INDEX_NAME ON TABLE_NAME(COLUMN);
 
 --type_parametre ---> parametre -->
 --type_unite_org ---> type_service ---> schema_comptable ---> montant_shema_comptable
 --montant_shema_comptable + parametre_recherche ---> montant_param_shema_comptable
+--
+--CREATE TABLE comments (
+--    comment_id integer PRIMARY KEY,
+--    user_id integer REFERENCES users ON DELETE CASCADE, -- will delete comments when user is deleted
+--    parent_id integer REFERENCES comments ON DELETE SET NULL, -- will set to null when parent is deleted
+--);

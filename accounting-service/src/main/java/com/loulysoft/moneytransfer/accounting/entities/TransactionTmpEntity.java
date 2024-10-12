@@ -10,15 +10,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "transaction_tmp")
 public class TransactionTmpEntity {
@@ -55,8 +54,8 @@ public class TransactionTmpEntity {
     @Column(name = "tra_autre_parametre")
     private String autreParametre;
 
-    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OperationTmpEntity> operations = new HashSet<>();
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.REMOVE)
+    private Set<OperationTmpEntity> operations;
 
     @Column(name = "tra_initial_transaction")
     private Long initialTransaction;
@@ -66,4 +65,12 @@ public class TransactionTmpEntity {
 
     @Column(name = "tra_pays_source")
     private String paysSource;
+
+    // Updated setter of operations
+    //    public void setOperations(Set<OperationTmpEntity> ops) {
+    //        this.operations.clear();
+    //        if (ops != null) {
+    //            this.operations.addAll(ops);
+    //        }
+    //    }
 }

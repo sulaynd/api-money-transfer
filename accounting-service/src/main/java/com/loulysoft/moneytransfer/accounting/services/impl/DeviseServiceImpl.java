@@ -11,10 +11,12 @@ import java.text.MessageFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class DeviseServiceImpl implements DeviseService {
     private static final String DEVISE_NOT_FOUND_MESSAGE = "Devise not found with code: {0}";
     private static final String PAYS_NOT_FOUND_MESSAGE = "Country not found with code: {0}";

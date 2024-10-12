@@ -7,6 +7,6 @@ import org.springframework.http.HttpStatus;
 public class TransactionException extends RrsException {
 
     public TransactionException(String message) {
-        super(HttpStatus.BAD_REQUEST, message);
+        super(HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 }

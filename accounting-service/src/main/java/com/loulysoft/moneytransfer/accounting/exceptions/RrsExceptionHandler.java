@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import javax.naming.ServiceUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +27,16 @@ public class RrsExceptionHandler {
 
     @ExceptionHandler({
         BadRequestException.class,
+        InvalidAmountException.class,
         ConstraintViolationException.class,
+        DataAccessException.class,
         // NoResourceFoundException.class,
         // HandlerMethodValidationException.class,
         MethodArgumentTypeMismatchException.class,
         MissingServletRequestParameterException.class,
         MethodArgumentNotValidException.class,
         MismatchedInputException.class,
-        HttpMessageNotReadableException.class,
-        TransactionException.class
+        HttpMessageNotReadableException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleBadRequestException(Exception exception) {
@@ -92,6 +94,12 @@ public class RrsExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ErrorResponse> handleServerException(Exception exception) {
+        return buildErrorResponse(mapToRrsException(exception, HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @ExceptionHandler(TransactionException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<ErrorResponse> handleTransactionException(TransactionException exception) {
         return buildErrorResponse(mapToRrsException(exception, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 

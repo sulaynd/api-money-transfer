@@ -9,7 +9,7 @@ public interface OperationTmpRepository extends JpaRepository<OperationTmpEntity
 
     Optional<OperationTmpEntity> findByTransactionIdAndMontantSchemaId(Long transactionId, Long montantSchemaId);
 
-    List<OperationTmpEntity> findByTransactionId(Long transactionId);
+    List<OperationTmpEntity> findOperationsByTransactionId(Long transactionId);
 
     //    String ql = "select o from Operation o join o.ecritureSchemaComptable esc join o.compte c where
     // esc.codeEcriture.code =:code"
